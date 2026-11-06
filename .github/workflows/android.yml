@@ -38,7 +38,15 @@ jobs:
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Installa template Android Godot
-        run: godot --headless --editor --path . --quit --install-android-build-template
+        run: |
+          godot --headless --editor --path . --install-android-build-template --quit
+
+      - name: Verifica template Android
+        run: |
+          if [ ! -d "android/build" ]; then
+            echo "ERRORE: template Android non trovato nella cartella android/build"
+            exit 1
+          fi
 
       - name: Esporta APK
         run: |

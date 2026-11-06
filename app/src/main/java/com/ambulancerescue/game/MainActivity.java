@@ -3,6 +3,7 @@ package com.ambulancerescue.game;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.graphics.Color;
 import android.graphics.Typeface;

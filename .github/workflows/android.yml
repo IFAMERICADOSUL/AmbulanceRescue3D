@@ -33,28 +33,52 @@ jobs:
         with:
           packages: "platform-tools"
 
-      - name: Installa componenti Android richiesti
+      - name: Installa componenti Android
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;23.2.8568313"
+          sdkmanager "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "cmdline-tools;latest" \
+            "cmake;3.10.2.4988404" \
+            "ndk;23.2.8568313"
 
-      - name: Verifica progetto
+      - name: Configura percorsi SDK in Godot
         run: |
-          echo "Versione Godot:"
-          godot --version
-          echo "Contenuto progetto:"
-          ls -la
+          mkdir -p "$HOME/.config/godot"
 
-      - name: Installa template ed esporta APK
+          cat > "$HOME/.config/godot/editor_settings-4.3.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "/usr/local/lib/android/sdk"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          EOF
+
+      - name: Installa template Android
+        run: |
+          godot --headless --editor --path . --quit --install-android-build-template
+
+      - name: Verifica configurazione
+        run: |
+          test -f "$ANDROID_HOME/platform-tools/adb"
+          test -f "$JAVA_HOME/bin/java"
+          test -d "$ANDROID_HOME/platforms/android-34"
+          test -d "$ANDROID_HOME/build-tools/34.0.0"
+          echo "SDK e Java configurati correttamente"
+
+      - name: Esporta APK
         run: |
           mkdir -p build
-          godot --headless --path . --install-android-build-template --export-debug "Android" build/FrontieraSelvaggia.apk
+          godot --headless --verbose --path . \
+            --export-debug "Android" \
+            build/FrontieraSelvaggia.apk
 
       - name: Verifica APK
         run: |
           test -f build/FrontieraSelvaggia.apk
           ls -lh build/FrontieraSelvaggia.apk
 
-      - name: Pubblica APK come artifact
+      - name: Pubblica APK
         uses: actions/upload-artifact@v4
         with:
           name: Frontiera-Selvaggia-Android

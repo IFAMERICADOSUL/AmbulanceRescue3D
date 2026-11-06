@@ -1,13 +1,14 @@
+
 plugins {
     id 'com.android.application'
 }
 
 android {
-    namespace 'com.frontiera.piccolafattoria'
+    namespace 'com.ambulancerescue.game'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.frontiera.piccolafattoria'
+        applicationId 'com.ambulancerescue.game'
         minSdk 23
         targetSdk 35
         versionCode 1

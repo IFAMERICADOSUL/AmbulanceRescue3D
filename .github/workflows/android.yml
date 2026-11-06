@@ -1,46 +1,46 @@
 
-name: Build Ambulance Rescue 3D APK
+name: Build Ambulance Rescue 3D
 
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "master"]
+    branches:
+      - main
+      - master
 
 jobs:
   build:
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Scarica repository
+      - name: Scarica il progetto
         uses: actions/checkout@v4
 
       - name: Installa Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
       - name: Configura Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools"
+          packages: platform-tools
 
-      - name: Installa componenti Android
+      - name: Installa Android SDK
         run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
+          sdkmanager "platform-tools"
 
-      - name: Installa Gradle
+      - name: Configura Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.9"
+          gradle-version: '8.9'
 
       - name: Compila APK
         run: gradle --no-daemon assembleDebug
-
-      - name: Verifica APK
-        run: |
-          test -f app/build/outputs/apk/debug/app-debug.apk
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Carica APK
         uses: actions/upload-artifact@v4
@@ -48,5 +48,3 @@ jobs:
           name: Ambulance-Rescue-3D
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 30
-          

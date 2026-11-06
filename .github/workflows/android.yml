@@ -35,23 +35,24 @@ jobs:
 
       - name: Installa componenti Android richiesti
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;23.2.8568313"
 
-      - name: Installa template Android Godot
+      - name: Verifica progetto
         run: |
-          godot --headless --editor --path . --install-android-build-template --quit
+          echo "Versione Godot:"
+          godot --version
+          echo "Contenuto progetto:"
+          ls -la
 
-      - name: Verifica template Android
-        run: |
-          if [ ! -d "android/build" ]; then
-            echo "ERRORE: template Android non trovato nella cartella android/build"
-            exit 1
-          fi
-
-      - name: Esporta APK
+      - name: Installa template ed esporta APK
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/FrontieraSelvaggia.apk
+          godot --headless --path . --install-android-build-template --export-debug "Android" build/FrontieraSelvaggia.apk
+
+      - name: Verifica APK
+        run: |
+          test -f build/FrontieraSelvaggia.apk
+          ls -lh build/FrontieraSelvaggia.apk
 
       - name: Pubblica APK come artifact
         uses: actions/upload-artifact@v4

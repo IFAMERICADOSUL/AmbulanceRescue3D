@@ -1,0 +1,48 @@
+name: Build APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Installa Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Installa Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+
+      - name: Configura Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Installa componenti Android richiesti
+        run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Installa template Android Godot
+        run: godot --headless --editor --path . --quit --install-android-build-template
+
+      - name: Esporta APK
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug "Android" build/FrontieraSelvaggia.apk
+
+      - name: Pubblica APK come artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Frontiera-Selvaggia-Android
+          path: build/FrontieraSelvaggia.apk
+          if-no-files-found: error
+          retention-days: 30
